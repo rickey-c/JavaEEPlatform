@@ -46,7 +46,7 @@ public class AdminProductController {
     public ReturnObject getProductById(@PathVariable("id") Long id) {
         logger.debug("getProductById: id = {} " ,id);
         ReturnObject retObj = null;
-        Product product = productService.retrieveProductByID(id, false);
+        Product product = productService.retrieveProductByID(id, false,false);
         AdminProductDto productDto = CloneFactory.copy(new AdminProductDto(), product);
         retObj = new ReturnObject(productDto);
         return  retObj;

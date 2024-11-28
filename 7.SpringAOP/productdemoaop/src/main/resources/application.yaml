@@ -13,10 +13,10 @@ spring:
     #JDBC驱动
     driver-class-name: com.mysql.cj.jdbc.Driver
     #数据库服务器url
-    url: jdbc:mysql://mysql:3306/oomall_demo?serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://120.46.2.240:3306/oomall_demo?serverTimezone=Asia/Shanghai
     #数据库服务器用户名和密码
-    username: demouser
-    password: 123456
+    username: root
+    password: OOADMySQL123456
     #数据库连接池
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
@@ -45,6 +45,21 @@ spring:
   jackson:
     #JSON的时间数据的时区
     time-zone: GMT+8
+  # Redis配置
+  data:
+    redis:
+      repositories:
+        enabled: false
+      host: 1.94.226.210
+      database: 0
+      password: OOADRedis123456
+      lettuce:
+        pool:
+          max-active: 100
+          max-wait: PT10S
+          max-idle: 30
+          min-idle: 1
+      connect-timeout: PT10S
 
 mybatis:
   #domain对象的包

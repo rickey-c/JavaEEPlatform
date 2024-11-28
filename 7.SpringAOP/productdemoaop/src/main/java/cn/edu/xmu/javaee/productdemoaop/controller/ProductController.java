@@ -6,6 +6,7 @@ import cn.edu.xmu.javaee.productdemoaop.controller.dto.ProductDto;
 import cn.edu.xmu.javaee.productdemoaop.dao.bo.Product;
 import cn.edu.xmu.javaee.productdemoaop.service.ProductService;
 import cn.edu.xmu.javaee.productdemoaop.util.CloneFactory;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +38,20 @@ public class ProductController {
     }
 
     @GetMapping("{id}")
-    public ReturnObject getProductById(@PathVariable("id") Long id, @RequestParam(required = false, defaultValue = "auto") String type) {
+    public ReturnObject getProductById(@PathVariable("id") Long id, @RequestParam(required = false, defaultValue = "auto") String type,
+                                       @RequestParam(required = false, defaultValue = "false") String useRedis) {
         logger.debug("getProductById: id = {} " ,id);
         ReturnObject retObj = null;
         Product product = null;
         if (null != type && "manual" == type){
             product = productService.findProductById_manual(id);
         } else {
-            product = productService.retrieveProductByID(id, true);
+            logger.info("useRedis = {}",useRedis);
+            if (useRedis.equals("true")){
+                product = productService.retrieveProductByID(id, true,true);
+            }else {
+                product = productService.retrieveProductByID(id, true,false);
+            }
         }
         ProductDto productDto = CloneFactory.copy(new ProductDto(), product);
         retObj = new ReturnObject(productDto);

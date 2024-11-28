@@ -4,12 +4,15 @@ import cn.edu.xmu.javaee.core.exception.BusinessException;
 import cn.edu.xmu.javaee.productdemoaop.dao.ProductDao;
 import cn.edu.xmu.javaee.productdemoaop.dao.bo.Product;
 import cn.edu.xmu.javaee.productdemoaop.dao.bo.User;
+import cn.edu.xmu.javaee.productdemoaop.util.RedisUtil;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Service
@@ -17,8 +20,15 @@ public class ProductService {
 
     private Logger logger = LoggerFactory.getLogger(ProductService.class);
 
+    @Resource
+    private RedisUtil redisUtil;
 
     private ProductDao productDao;
+
+    private final String PRODUCT_CACHE_KEY = "product:";
+
+    private final Long CACHE_TIME_OUT = 100L;
+    
 
     @Autowired
     public ProductService(ProductDao productDao) {
@@ -32,9 +42,31 @@ public class ProductService {
      * @return 商品对象
      */
     @Transactional(rollbackFor = {BusinessException.class})
-    public Product retrieveProductByID(Long id, boolean all) throws BusinessException {
+    public Product retrieveProductByID(Long id, boolean all,boolean useRedis) throws BusinessException {
         logger.debug("findProductById: id = {}, all = {}", id, all);
-        return productDao.retrieveProductByID(id, all);
+        if (useRedis){
+            String cacheKey = PRODUCT_CACHE_KEY + id;
+            // 查缓存
+            Product product = (Product)redisUtil.get(cacheKey);
+            if (product!=null){
+                logger.info("Hit product: key = {}",cacheKey);
+                return product;
+            }
+            // 查数据库
+            product = productDao.retrieveProductByID(id, all, true);
+            if (product!=null){
+                // 存入缓存
+                boolean setResult = redisUtil.set(cacheKey, product, CACHE_TIME_OUT);
+                logger.info("Store product: key = {},result = {}",cacheKey,setResult);
+            }
+            return product;
+        }
+        else {
+            // 查数据库
+            Product product = productDao.retrieveProductByID(id, all, false);
+            return product;
+        }
+        // return productDao.retrieveProductByID(id, all);
     }
 
     /**
