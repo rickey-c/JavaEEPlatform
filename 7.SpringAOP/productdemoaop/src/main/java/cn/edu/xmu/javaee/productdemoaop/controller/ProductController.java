@@ -39,15 +39,15 @@ public class ProductController {
 
     @GetMapping("{id}")
     public ReturnObject getProductById(@PathVariable("id") Long id, @RequestParam(required = false, defaultValue = "auto") String type,
-                                       @RequestParam(required = false, defaultValue = "false") String useRedis) {
+                                       @RequestParam(required = false, defaultValue = "false") Boolean useRedis) {
         logger.debug("getProductById: id = {} " ,id);
         ReturnObject retObj = null;
         Product product = null;
-        if (null != type && "manual" == type){
+        if ("manual".equals(type)){
             product = productService.findProductById_manual(id);
         } else {
             logger.info("useRedis = {}",useRedis);
-            if (useRedis.equals("true")){
+            if (useRedis.equals(Boolean.TRUE)){
                 product = productService.retrieveProductByID(id, true,true);
             }else {
                 product = productService.retrieveProductByID(id, true,false);

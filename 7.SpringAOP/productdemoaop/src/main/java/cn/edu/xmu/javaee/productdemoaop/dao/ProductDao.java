@@ -130,7 +130,8 @@ public class ProductDao {
                     product = this.retrieveFullProduct(productPo, true);
                     // 1. 存入product
                     cacheKey = PRODUCT_CACHE_KEY + productId;
-                    redisUtil.set(cacheKey,product,CACHE_TIME_OUT);
+                    boolean setResult = redisUtil.set(cacheKey, product, CACHE_TIME_OUT);
+                    logger.info("Store product: key = {}, result = {}", cacheKey, setResult);
                 } else {
                     product = CloneFactory.copy(new Product(), productPo);
                 }
