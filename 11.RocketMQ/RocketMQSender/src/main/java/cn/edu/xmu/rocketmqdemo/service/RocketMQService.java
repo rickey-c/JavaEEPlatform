@@ -44,16 +44,16 @@ public class RocketMQService {
 
         String json = JacksonUtil.toJson(log);
         Message message = MessageBuilder.withPayload(json).build();
-        logger.info("sendLogMessage: message = " + message);
+        logger.info("sendLogMessage: message = {}", message);
         rocketMQTemplate.sendOneWay("log-topic:1", message);
     }
 
     public void sendOrderPayMessage(Long orderId){
-        logger.info("sendOrderPayMessage: send message orderId = "+orderId+" delay ="+delayLevel+" time =" +LocalDateTime.now());
+        logger.info("sendOrderPayMessage: send message orderId = {} delay ={} time ={}", orderId, delayLevel, LocalDateTime.now());
         rocketMQTemplate.asyncSend("order-pay-topic", MessageBuilder.withPayload(orderId.toString()).build(), new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
-                logger.info("sendOrderPayMessage: onSuccess result = "+ sendResult+" time ="+LocalDateTime.now());
+                logger.info("sendOrderPayMessage: onSuccess result = {} time ={}", sendResult, LocalDateTime.now());
             }
 
             @Override

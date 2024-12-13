@@ -7,14 +7,18 @@ management:
 server:
   #服务端口号
   port: 8080
-
 spring:
   data:
     #MongoDB configuration
     mongodb:
-      host: mongo
+      host1: mongo1
+      host2: mongo2
+      host3: mongo3
+      database: oomall
+      username: demouser
+      password: 123456
       port: 27017
-      database: oomall_demo
+
   jackson:
     #JSON的时间数据的时区
     time-zone: GMT+8
